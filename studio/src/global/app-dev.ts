@@ -50,3 +50,14 @@ setupDeckGoConfig({
     cdn: 'https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js'
   }
 });
+
+
+import {deleteAllLocal, exportSlides, importData} from "../app/export";
+
+
+// @ts-ignore
+window.exportSlides = exportSlides;
+// @ts-ignore
+window.importSlides = importData;
+// @ts-ignore
+window.deleteAllLocal = deleteAllLocal;

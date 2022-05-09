@@ -16,34 +16,18 @@ export namespace Components {
         "width": number;
         "widthOffset": number;
     }
-    interface AppExperimentalSettings {
-    }
-    interface AppGeneralSettings {
-    }
-    interface AppHeader {
-    }
     interface AppLogo {
-    }
-    interface AppNotes {
     }
     interface AppRemote {
         "room": string;
     }
-    interface AppRemoteConnect {
-    }
     interface AppRemoteSlidePicker {
     }
-    interface AppRoot {
+    interface AppRemoteViewer {
     }
-    interface AppSettings {
+    interface AppRootControl {
     }
-    interface AppStopwatch {
-        "length": number;
-        "remaining": number;
-    }
-    interface AppStopwatchTime {
-    }
-    interface AppTimer {
+    interface AppRootView {
     }
 }
 declare global {
@@ -59,35 +43,11 @@ declare global {
         prototype: HTMLAppDrawElement;
         new (): HTMLAppDrawElement;
     };
-    interface HTMLAppExperimentalSettingsElement extends Components.AppExperimentalSettings, HTMLStencilElement {
-    }
-    var HTMLAppExperimentalSettingsElement: {
-        prototype: HTMLAppExperimentalSettingsElement;
-        new (): HTMLAppExperimentalSettingsElement;
-    };
-    interface HTMLAppGeneralSettingsElement extends Components.AppGeneralSettings, HTMLStencilElement {
-    }
-    var HTMLAppGeneralSettingsElement: {
-        prototype: HTMLAppGeneralSettingsElement;
-        new (): HTMLAppGeneralSettingsElement;
-    };
-    interface HTMLAppHeaderElement extends Components.AppHeader, HTMLStencilElement {
-    }
-    var HTMLAppHeaderElement: {
-        prototype: HTMLAppHeaderElement;
-        new (): HTMLAppHeaderElement;
-    };
     interface HTMLAppLogoElement extends Components.AppLogo, HTMLStencilElement {
     }
     var HTMLAppLogoElement: {
         prototype: HTMLAppLogoElement;
         new (): HTMLAppLogoElement;
-    };
-    interface HTMLAppNotesElement extends Components.AppNotes, HTMLStencilElement {
-    }
-    var HTMLAppNotesElement: {
-        prototype: HTMLAppNotesElement;
-        new (): HTMLAppNotesElement;
     };
     interface HTMLAppRemoteElement extends Components.AppRemote, HTMLStencilElement {
     }
@@ -95,64 +55,39 @@ declare global {
         prototype: HTMLAppRemoteElement;
         new (): HTMLAppRemoteElement;
     };
-    interface HTMLAppRemoteConnectElement extends Components.AppRemoteConnect, HTMLStencilElement {
-    }
-    var HTMLAppRemoteConnectElement: {
-        prototype: HTMLAppRemoteConnectElement;
-        new (): HTMLAppRemoteConnectElement;
-    };
     interface HTMLAppRemoteSlidePickerElement extends Components.AppRemoteSlidePicker, HTMLStencilElement {
     }
     var HTMLAppRemoteSlidePickerElement: {
         prototype: HTMLAppRemoteSlidePickerElement;
         new (): HTMLAppRemoteSlidePickerElement;
     };
-    interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
+    interface HTMLAppRemoteViewerElement extends Components.AppRemoteViewer, HTMLStencilElement {
     }
-    var HTMLAppRootElement: {
-        prototype: HTMLAppRootElement;
-        new (): HTMLAppRootElement;
+    var HTMLAppRemoteViewerElement: {
+        prototype: HTMLAppRemoteViewerElement;
+        new (): HTMLAppRemoteViewerElement;
     };
-    interface HTMLAppSettingsElement extends Components.AppSettings, HTMLStencilElement {
+    interface HTMLAppRootControlElement extends Components.AppRootControl, HTMLStencilElement {
     }
-    var HTMLAppSettingsElement: {
-        prototype: HTMLAppSettingsElement;
-        new (): HTMLAppSettingsElement;
+    var HTMLAppRootControlElement: {
+        prototype: HTMLAppRootControlElement;
+        new (): HTMLAppRootControlElement;
     };
-    interface HTMLAppStopwatchElement extends Components.AppStopwatch, HTMLStencilElement {
+    interface HTMLAppRootViewElement extends Components.AppRootView, HTMLStencilElement {
     }
-    var HTMLAppStopwatchElement: {
-        prototype: HTMLAppStopwatchElement;
-        new (): HTMLAppStopwatchElement;
-    };
-    interface HTMLAppStopwatchTimeElement extends Components.AppStopwatchTime, HTMLStencilElement {
-    }
-    var HTMLAppStopwatchTimeElement: {
-        prototype: HTMLAppStopwatchTimeElement;
-        new (): HTMLAppStopwatchTimeElement;
-    };
-    interface HTMLAppTimerElement extends Components.AppTimer, HTMLStencilElement {
-    }
-    var HTMLAppTimerElement: {
-        prototype: HTMLAppTimerElement;
-        new (): HTMLAppTimerElement;
+    var HTMLAppRootViewElement: {
+        prototype: HTMLAppRootViewElement;
+        new (): HTMLAppRootViewElement;
     };
     interface HTMLElementTagNameMap {
         "app-bottom-sheet": HTMLAppBottomSheetElement;
         "app-draw": HTMLAppDrawElement;
-        "app-experimental-settings": HTMLAppExperimentalSettingsElement;
-        "app-general-settings": HTMLAppGeneralSettingsElement;
-        "app-header": HTMLAppHeaderElement;
         "app-logo": HTMLAppLogoElement;
-        "app-notes": HTMLAppNotesElement;
         "app-remote": HTMLAppRemoteElement;
-        "app-remote-connect": HTMLAppRemoteConnectElement;
         "app-remote-slide-picker": HTMLAppRemoteSlidePickerElement;
-        "app-root": HTMLAppRootElement;
-        "app-settings": HTMLAppSettingsElement;
-        "app-stopwatch": HTMLAppStopwatchElement;
-        "app-stopwatch-time": HTMLAppStopwatchTimeElement;
-        "app-timer": HTMLAppTimerElement;
+        "app-remote-viewer": HTMLAppRemoteViewerElement;
+        "app-root-control": HTMLAppRootControlElement;
+        "app-root-view": HTMLAppRootViewElement;
     }
 }
 declare namespace LocalJSX {
@@ -165,51 +100,28 @@ declare namespace LocalJSX {
         "width"?: number;
         "widthOffset"?: number;
     }
-    interface AppExperimentalSettings {
-    }
-    interface AppGeneralSettings {
-    }
-    interface AppHeader {
-    }
     interface AppLogo {
-    }
-    interface AppNotes {
     }
     interface AppRemote {
         "room"?: string;
     }
-    interface AppRemoteConnect {
-    }
     interface AppRemoteSlidePicker {
     }
-    interface AppRoot {
+    interface AppRemoteViewer {
     }
-    interface AppSettings {
+    interface AppRootControl {
     }
-    interface AppStopwatch {
-        "length"?: number;
-        "remaining"?: number;
-    }
-    interface AppStopwatchTime {
-    }
-    interface AppTimer {
+    interface AppRootView {
     }
     interface IntrinsicElements {
         "app-bottom-sheet": AppBottomSheet;
         "app-draw": AppDraw;
-        "app-experimental-settings": AppExperimentalSettings;
-        "app-general-settings": AppGeneralSettings;
-        "app-header": AppHeader;
         "app-logo": AppLogo;
-        "app-notes": AppNotes;
         "app-remote": AppRemote;
-        "app-remote-connect": AppRemoteConnect;
         "app-remote-slide-picker": AppRemoteSlidePicker;
-        "app-root": AppRoot;
-        "app-settings": AppSettings;
-        "app-stopwatch": AppStopwatch;
-        "app-stopwatch-time": AppStopwatchTime;
-        "app-timer": AppTimer;
+        "app-remote-viewer": AppRemoteViewer;
+        "app-root-control": AppRootControl;
+        "app-root-view": AppRootView;
     }
 }
 export { LocalJSX as JSX };
@@ -218,19 +130,12 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-bottom-sheet": LocalJSX.AppBottomSheet & JSXBase.HTMLAttributes<HTMLAppBottomSheetElement>;
             "app-draw": LocalJSX.AppDraw & JSXBase.HTMLAttributes<HTMLAppDrawElement>;
-            "app-experimental-settings": LocalJSX.AppExperimentalSettings & JSXBase.HTMLAttributes<HTMLAppExperimentalSettingsElement>;
-            "app-general-settings": LocalJSX.AppGeneralSettings & JSXBase.HTMLAttributes<HTMLAppGeneralSettingsElement>;
-            "app-header": LocalJSX.AppHeader & JSXBase.HTMLAttributes<HTMLAppHeaderElement>;
             "app-logo": LocalJSX.AppLogo & JSXBase.HTMLAttributes<HTMLAppLogoElement>;
-            "app-notes": LocalJSX.AppNotes & JSXBase.HTMLAttributes<HTMLAppNotesElement>;
             "app-remote": LocalJSX.AppRemote & JSXBase.HTMLAttributes<HTMLAppRemoteElement>;
-            "app-remote-connect": LocalJSX.AppRemoteConnect & JSXBase.HTMLAttributes<HTMLAppRemoteConnectElement>;
             "app-remote-slide-picker": LocalJSX.AppRemoteSlidePicker & JSXBase.HTMLAttributes<HTMLAppRemoteSlidePickerElement>;
-            "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
-            "app-settings": LocalJSX.AppSettings & JSXBase.HTMLAttributes<HTMLAppSettingsElement>;
-            "app-stopwatch": LocalJSX.AppStopwatch & JSXBase.HTMLAttributes<HTMLAppStopwatchElement>;
-            "app-stopwatch-time": LocalJSX.AppStopwatchTime & JSXBase.HTMLAttributes<HTMLAppStopwatchTimeElement>;
-            "app-timer": LocalJSX.AppTimer & JSXBase.HTMLAttributes<HTMLAppTimerElement>;
+            "app-remote-viewer": LocalJSX.AppRemoteViewer & JSXBase.HTMLAttributes<HTMLAppRemoteViewerElement>;
+            "app-root-control": LocalJSX.AppRootControl & JSXBase.HTMLAttributes<HTMLAppRootControlElement>;
+            "app-root-view": LocalJSX.AppRootView & JSXBase.HTMLAttributes<HTMLAppRootViewElement>;
         }
     }
 }

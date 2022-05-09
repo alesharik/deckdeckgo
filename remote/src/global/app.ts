@@ -10,6 +10,7 @@ import '@deckdeckgo/math';
 import '@deckdeckgo/word-cloud';
 import '@deckdeckgo/markdown';
 import '@deckdeckgo/elements';
+import '@deckdeckgo/remote';
 
 import '@deckdeckgo/slide-title';
 import '@deckdeckgo/slide-author';

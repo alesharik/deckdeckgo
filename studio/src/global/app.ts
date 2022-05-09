@@ -22,6 +22,7 @@ import '@deckdeckgo/slide-youtube';
 import '@deckdeckgo/social-img';
 import '@deckdeckgo/studio';
 import '@deckdeckgo/word-cloud';
+import 'deckdeckgo-remote';
 import '@ionic/core';
 import {setupConfig} from '@ionic/core';
 import {setupConfig as setupDeckGoConfig} from '../app/config/environment-config';
@@ -80,12 +81,12 @@ setupDeckGoConfig({
   }
 });
 
-// IE9: https://stackoverflow.com/questions/5472938/does-ie9-support-console-log-and-is-it-a-real-function#answer-5473193
-const log: any = Function.prototype.bind.call(console.log, console);
-log.apply(console, ['%cDeckDeckGo', 'color: #3880ff;font-size:2rem;font-weight: 300;']);
-log.apply(console, [
-  '%cHey there, interested by our code? Lucky you, we are open source :)',
-  'color: black;font-size:1rem;font-weight: 300;'
-]);
-log.apply(console, ['%cCome say hi and contribute to our project on Github', 'color: black;font-size:1rem;font-weight: 300;']);
-log.apply(console, ['%chttps://github.com/deckgo/deckdeckgo', 'font-size:1rem;font-weight: 300;']);
+import {deleteAllLocal, exportSlides, importData} from "../app/export";
+
+
+// @ts-ignore
+window.exportSlides = exportSlides;
+// @ts-ignore
+window.importSlides = importData;
+// @ts-ignore
+window.deleteAllLocal = deleteAllLocal;

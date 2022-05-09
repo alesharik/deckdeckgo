@@ -1,6 +1,10 @@
 import {StorageFile, StorageFilesList, throwError} from '@deckdeckgo/editor';
-import {keys, set} from 'idb-keyval';
+import {keys, set, del} from 'idb-keyval';
 import {encodeFilename} from '../utils/storage.utils';
+export interface SlideProxy {
+  uploadFile(data: File, folder: string): Promise<StorageFile>
+  getFiles(folder: string): Promise<StorageFile[]>
+}
 
 export const uploadOfflineFile = async (data: File, folder: string, maxSize: number): Promise<StorageFile | undefined> => {
   return new Promise<StorageFile>(async (resolve) => {
@@ -14,6 +18,14 @@ export const uploadOfflineFile = async (data: File, folder: string, maxSize: num
       if (data.size > maxSize) {
         throwError(`File is too big (max. ${maxSize / 1048576} Mb)`);
         resolve(undefined);
+        return;
+      }
+
+      // @ts-ignore
+      if (window.slideProxy) {
+        // @ts-ignore
+        const proxy = window.slideProxy as SlideProxy;
+        resolve(proxy.uploadFile(data, folder));
         return;
       }
 
@@ -35,6 +47,18 @@ export const uploadOfflineFile = async (data: File, folder: string, maxSize: num
 
 export const getOfflineFiles = (folder: string): Promise<StorageFilesList | null> => {
   return new Promise<StorageFilesList | null>(async (resolve) => {
+
+    // @ts-ignore
+    if (window.slideProxy) {
+      // @ts-ignore
+      const proxy = window.slideProxy as SlideProxy;
+      resolve({
+        items: await proxy.getFiles(folder),
+        nextPageToken: undefined
+      });
+      return;
+    }
+
     const storageKeys: IDBValidKey[] = await keys();
 
     if (!storageKeys || storageKeys.length <= 0) {

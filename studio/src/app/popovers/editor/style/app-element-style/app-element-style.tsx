@@ -104,18 +104,8 @@ export class AppElementStyle {
         {this.renderSelectTarget()}
 
         {this.renderStyleOptions()}
-
-        {this.renderEditMode()}
       </Host>
     );
-  }
-
-  private renderEditMode() {
-    if (this.applyToTargetElement === TargetElement.TRANSITION) {
-      return undefined;
-    }
-
-    return <app-edit-mode></app-edit-mode>;
   }
 
   private renderSelectTarget() {

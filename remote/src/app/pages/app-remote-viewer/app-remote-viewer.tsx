@@ -1,10 +1,8 @@
-import {Component, Element, Prop, State, h, JSX} from '@stencil/core';
+import {Component, Element, State, h, JSX, Listen} from '@stencil/core';
 
 import {isMobile} from '@deckdeckgo/utils';
 
-import notesStores from '../../stores/notes.store';
 import remoteStore from '../../stores/remote.store';
-import accStore from '../../stores/accelerometer.store';
 
 // Types
 import {
@@ -30,19 +28,19 @@ import {CommunicationService} from '../../services/communication/communication.s
 import {AccelerometerService} from '../../services/accelerometer/accelerometer.service';
 
 @Component({
-  tag: 'app-remote',
-  styleUrl: 'app-remote.scss'
+  tag: 'app-remote-viewer',
+  styleUrl: 'app-remote-viewer.scss'
 })
-export class AppRemote {
+export class AppRemoteViewer {
   @Element() el: HTMLElement;
-
-  @Prop()
-  room: string;
 
   private stateDestroyListener;
   private eventDestroyListener;
 
   @State() private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
+
+  // @State() private deckWidth: number;
+  // @State() private deckHeight: number;
 
   @State() private slides: JSX.IntrinsicElements[] = [];
   @State() private slideIndex: number = 0;
@@ -56,13 +54,9 @@ export class AppRemote {
 
   @State() extraPlayAction: boolean = false;
 
-  private destroyAcceleratorListener;
-  private destroyAcceleratorInitListener;
-  private deckLoaded: boolean = false;
-  private currentSlide: number = 0;
-
   private communicationService: CommunicationService;
   private accelerometerService: AccelerometerService;
+  private deckLoaded: boolean = false;
 
   constructor() {
     this.communicationService = CommunicationService.getInstance();
@@ -82,56 +76,36 @@ export class AppRemote {
     });
 
     this.eventDestroyListener = remoteStore.onChange('$event', async ($event: DeckdeckgoEvent) => {
-      if ($event.emitter === DeckdeckgoEventEmitter.DECK) {
-        if ($event.type === DeckdeckgoEventType.SLIDES_ANSWER) {
-          if (this.deckLoaded) {
-            await this.slidePickerTo(this.currentSlide);
-            return;
-          }
-          this.deckLoaded = true;
-          await this.initDeckAndSlides($event as DeckdeckgoEventDeck);
-          await this.slidePickerTo(0);
-        } else if ($event.type === DeckdeckgoEventType.DECK_UPDATE) {
-          await this.initDeckAndSlides($event as DeckdeckgoEventDeck);
-          await this.setNotes();
-        } else if ($event.type === DeckdeckgoEventType.SLIDE_UPDATE) {
-          await this.lazyLoadPollContent($event as DeckdeckgoEventSlide);
-          await this.updateSlide($event as DeckdeckgoEventSlide);
-          await this.setNotes();
-        } else if ($event.type === DeckdeckgoEventType.NEXT_SLIDE) {
-          await this.animateNextSlide(($event as DeckdeckgoEventNextPrevSlide).slideAnimation);
-        } else if ($event.type === DeckdeckgoEventType.PREV_SLIDE) {
-          await this.animatePrevSlide(($event as DeckdeckgoEventNextPrevSlide).slideAnimation);
-        } else if ($event.type === DeckdeckgoEventType.SLIDE_TO) {
-          const index: number = ($event as DeckdeckgoEventSlideTo).index;
-          const speed: number = ($event as DeckdeckgoEventSlideTo).speed;
-
-          await this.slideTo(index, speed);
-        } else if ($event.type === DeckdeckgoEventType.DELETE_SLIDE) {
-          await this.deleteSlide();
-        } else if ($event.type === DeckdeckgoEventType.SLIDE_ACTION) {
-          this.action = ($event as DeckdeckgoEventSlideAction).action;
-        } else if ($event.type === DeckdeckgoEventType.DECK_REVEAL_UPDATE) {
-          this.deckReveal = ($event as DeckdeckgoEventDeckReveal).reveal;
+      if ($event.type === DeckdeckgoEventType.SLIDES_ANSWER) {
+        // @ts-ignore
+        if (!$event.deck) {
+          return;
         }
-      }
-    });
-
-    this.destroyAcceleratorListener = accStore.onChange('trigger', async (prev: boolean) => {
-      await this.prevNextSlide(prev, false);
-
-      setTimeout(async () => {
-        await this.startAccelerometer();
-      }, this.accelerometerService.delay);
-    });
-
-    this.destroyAcceleratorInitListener = accStore.onChange('initialized', async (initialized: boolean) => {
-      if (initialized) {
-        const deck: HTMLElement = this.el.querySelector('deckgo-deck');
-
-        if (deck) {
-          await this.startAccelerometer();
+        if (this.deckLoaded) {
+          return;
         }
+        this.deckLoaded = true
+        await this.initDeckAndSlides($event as DeckdeckgoEventDeck);
+      } else if ($event.type === DeckdeckgoEventType.DECK_UPDATE) {
+        await this.initDeckAndSlides($event as DeckdeckgoEventDeck);
+      } else if ($event.type === DeckdeckgoEventType.SLIDE_UPDATE) {
+        await this.lazyLoadPollContent($event as DeckdeckgoEventSlide);
+        await this.updateSlide($event as DeckdeckgoEventSlide);
+      } else if ($event.type === DeckdeckgoEventType.NEXT_SLIDE) {
+        await this.animateNextSlide(($event as DeckdeckgoEventNextPrevSlide).slideAnimation);
+      } else if ($event.type === DeckdeckgoEventType.PREV_SLIDE) {
+        await this.animatePrevSlide(($event as DeckdeckgoEventNextPrevSlide).slideAnimation);
+      } else if ($event.type === DeckdeckgoEventType.SLIDE_TO) {
+        const index: number = ($event as DeckdeckgoEventSlideTo).index;
+        const speed: number = ($event as DeckdeckgoEventSlideTo).speed;
+
+        await this.slideTo(index, speed);
+      } else if ($event.type === DeckdeckgoEventType.DELETE_SLIDE) {
+        await this.deleteSlide();
+      } else if ($event.type === DeckdeckgoEventType.SLIDE_ACTION) {
+        this.action = ($event as DeckdeckgoEventSlideAction).action;
+      } else if ($event.type === DeckdeckgoEventType.DECK_REVEAL_UPDATE) {
+        this.deckReveal = ($event as DeckdeckgoEventDeckReveal).reveal;
       }
     });
 
@@ -149,6 +123,37 @@ export class AppRemote {
     document.querySelectorAll("*[resize]").forEach(value => value.removeAttribute('resize'));
     document.querySelectorAll("*[rotation]").forEach(value => value.removeAttribute('rotation'));
     document.querySelectorAll("*[drag]").forEach(value => value.setAttribute('drag', 'none'));
+  }
+
+
+  @Listen('mousedown', {capture: true})
+  mousedown($event: MouseEvent) {
+    $event.stopPropagation();
+  }
+
+  @Listen('touchstart', {capture: true})
+  touchstart($event: TouchEvent) {
+    $event.stopPropagation();
+  }
+
+  @Listen('mouseup', {capture: true})
+  async mouseup($event: MouseEvent) {
+    $event.stopPropagation();
+  }
+
+  @Listen('touchend', {capture: true})
+  async touchend($event: TouchEvent) {
+    $event.stopPropagation();
+  }
+
+  @Listen('mousemove', {capture: true})
+  async mousemove($event: MouseEvent) {
+    $event.stopPropagation();
+  }
+
+  @Listen('touchmove', {capture: true})
+  async touchmove($event: TouchEvent) {
+    $event.stopPropagation();
   }
 
   private initDeckAndSlides($event: DeckdeckgoEventDeck): Promise<void> {
@@ -198,14 +203,6 @@ export class AppRemote {
     if (this.eventDestroyListener) {
       this.eventDestroyListener();
     }
-
-    if (this.destroyAcceleratorListener) {
-      this.destroyAcceleratorListener();
-    }
-
-    if (this.destroyAcceleratorInitListener) {
-      this.destroyAcceleratorInitListener();
-    }
   }
 
   private deckSize(): Promise<void> {
@@ -216,48 +213,24 @@ export class AppRemote {
         return;
       }
 
+      // this.deckWidth = container.offsetWidth;
+      // this.deckHeight = container.offsetHeight;
+
+      const header: HTMLElement = this.el.querySelector('ion-header');
+
+      if (!header) {
+        return;
+      }
+      //
+      // this.drawHeightOffset = header.offsetHeight + parseInt(window.getComputedStyle(container).marginTop);
+      // this.drawWidthOffset = parseInt(window.getComputedStyle(container).marginLeft);
 
       resolve();
     });
   }
 
-  private async prevNextSlide(prev: boolean, slideAnimation: boolean) {
-    if (prev) {
-      await this.emitPrevSlide(slideAnimation);
-      await this.animatePrevSlide(slideAnimation);
-    } else {
-      await this.emitNextSlide(slideAnimation);
-      await this.animateNextSlide(slideAnimation);
-    }
-  }
-
-  private async slideDidChange(prev: boolean) {
-    if (prev) {
-      await this.emitPrevSlide(false);
-    } else {
-      await this.emitNextSlide(false);
-    }
-
-    await this.afterSwipe();
-  }
-
-  private async emitNextSlide(slideAnimation: boolean): Promise<void> {
-    await this.emitPrevNextSlide(DeckdeckgoEventType.NEXT_SLIDE, slideAnimation);
-    this.currentSlide++;
-  }
-
-  private async emitPrevSlide(slideAnimation: boolean) {
-    await this.emitPrevNextSlide(DeckdeckgoEventType.PREV_SLIDE, slideAnimation);
-    this.currentSlide--;
-  }
-
-  private async emitPrevNextSlide(type: DeckdeckgoEventType, slideAnimation: boolean) {
-    this.emitSlidePrevNext(type, slideAnimation);
-  }
-
   private async afterSwipe() {
     await this.setActiveIndex();
-    await this.setNotes();
 
     this.action = null;
   }
@@ -288,16 +261,6 @@ export class AppRemote {
       (element.nodeName.toLowerCase() === 'deckgo-slide-youtube' || element.nodeName.toLowerCase() === 'deckgo-slide-video');
   }
 
-  private async setNotes() {
-    let next: HTMLElement = null;
-
-    if (this.slides && this.slides.length > this.slideIndex) {
-      next = this.el.querySelector('.deckgo-slide-container:nth-child(' + (this.slideIndex + 1) + ')');
-    }
-
-    notesStores.state.currentSlide = next;
-  }
-
   private async lazyLoadPollContent($slideEvent: DeckdeckgoEventSlide) {
     if (!$slideEvent || !$slideEvent.slide || !document) {
       return;
@@ -320,14 +283,6 @@ export class AppRemote {
       },
       {once: true}
     );
-  }
-
-  private emitSlidePrevNext(type: DeckdeckgoEventType, slideAnimation: boolean) {
-    this.communicationService.emit({
-      type: type,
-      emitter: DeckdeckgoEventEmitter.APP,
-      slideAnimation: slideAnimation
-    });
   }
 
   private async animateNextSlide(slideAnimation: boolean) {
@@ -391,88 +346,6 @@ export class AppRemote {
     }
   }
 
-  private moveDraw(event: CustomEvent<number>): Promise<void> {
-    return new Promise<void>(async (resolve) => {
-      const draw: HTMLAppDrawElement = this.el.querySelector('app-draw');
-
-      if (!draw) {
-        resolve();
-        return;
-      }
-
-      await draw.moveDraw(event.detail, '300ms');
-
-      resolve();
-    });
-  }
-
-  private scrollDraw(event: CustomEvent<number>): Promise<void> {
-    return new Promise<void>(async (resolve) => {
-      const draw: HTMLAppDrawElement = this.el.querySelector('app-draw');
-
-      if (!draw) {
-        resolve();
-        return;
-      }
-
-      await draw.moveDraw(event.detail, '0ms');
-
-      resolve();
-    });
-  }
-
-  private async emitAction($event: UIEvent) {
-    $event.stopPropagation();
-
-    this.action = this.action === DeckdeckgoSlideAction.PLAY ? DeckdeckgoSlideAction.PAUSE : DeckdeckgoSlideAction.PLAY;
-
-    this.communicationService.emit({
-      type: DeckdeckgoEventType.SLIDE_ACTION,
-      emitter: DeckdeckgoEventEmitter.APP,
-      action: this.action
-    });
-
-    await this.actionPlayPause();
-  }
-
-  private actionPlayPause(): Promise<void> {
-    return new Promise<void>(async (resolve) => {
-      const deck = this.el.querySelector('deckgo-deck');
-
-      if (!deck) {
-        resolve();
-        return;
-      }
-
-      const index = await (deck as any).getActiveIndex();
-
-      const slideElement: any = this.el.querySelector('.deckgo-slide-container:nth-child(' + (index + 1) + ')');
-
-      if (!slideElement) {
-        resolve();
-        return;
-      }
-
-      if (this.action === DeckdeckgoSlideAction.PAUSE) {
-        await slideElement.pause();
-      } else {
-        await slideElement.play();
-      }
-
-      resolve();
-    });
-  }
-
-  async slidePickerTo(newSlideIndex: number) {
-    await this.slideTo(newSlideIndex);
-
-    this.communicationService.emit({
-      type: DeckdeckgoEventType.SLIDE_TO,
-      emitter: DeckdeckgoEventEmitter.APP,
-      index: newSlideIndex
-    });
-  }
-
   private async connect() {
     await this.disconnect();
     await this.communicationService.connect();
@@ -486,7 +359,6 @@ export class AppRemote {
   private async initDeck() {
     await this.deckSize();
     await this.startAccelerometer();
-    await this.setNotes();
   }
 
   private async startAccelerometer() {
@@ -507,19 +379,6 @@ export class AppRemote {
         <main class="connected">
           <div class="deck-container">
             {this.renderDeck()}
-
-            <div class="deck-navigation-container">
-              <div class="deck-navigation-button deck-navigation-button-prev"
-                   onClick={() => this.prevNextSlide(true, true)}>
-                <span>&lt;</span>
-              </div>
-              <div class="deck-navigation-button deck-navigation-button-next"
-                   onClick={() => this.prevNextSlide(false, true)}>
-                <span>&gt;</span>
-              </div>
-            </div>
-
-            {this.renderExtraActions()}
           </div>
         </main>
       ];
@@ -561,39 +420,11 @@ export class AppRemote {
           revealOnMobile={this.deckRevealOnMobile}
           reveal={this.deckReveal}
           onSlidesDidLoad={() => this.initDeck()}
-          onSlideNextDidChange={() => this.slideDidChange(false)}
-          onSlidePrevDidChange={() => this.slideDidChange(true)}
-          onSlideWillChange={(event: CustomEvent<number>) => this.moveDraw(event)}
-          contentEditable={false}
-          onSlideDrag={(event: CustomEvent<number>) => this.scrollDraw(event)}>
+          contentEditable={false}>
           {this.slides}
         </deckgo-deck>
-        {/*<app-draw*/}
-        {/*  width={this.deckWidth}*/}
-        {/*  height={this.deckHeight}*/}
-        {/*  slides={this.slides.length}*/}
-        {/*  heightOffset={this.drawHeightOffset}*/}
-        {/*  widthOffset={this.drawWidthOffset}></app-draw>*/}
+        {/*<deckgo-remote width={this.deckWidth} height={this.deckHeight} autoConnect={true} />*/}
       </div>
     );
-  }
-
-  private renderExtraActions() {
-    if (this.extraPlayAction) {
-      const icon: string = this.action === DeckdeckgoSlideAction.PLAY ? 'pause' : 'play';
-
-      return (
-        <div class="deck-action-button">
-          <button
-            onClick={(e: UIEvent) => this.emitAction(e)}
-            aria-label={icon}
-            style={{'--action-button-background': 'var(--ion-color-tertiary'}}>
-            <ion-icon name={icon} class={`deck-action-button-icon-${icon}`}></ion-icon>
-          </button>
-        </div>
-      );
-    } else {
-      return undefined;
-    }
   }
 }

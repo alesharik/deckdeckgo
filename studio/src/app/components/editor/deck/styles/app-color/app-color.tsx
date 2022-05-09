@@ -342,7 +342,7 @@ export class AppColor {
       <Fragment>
         <ion-item-divider class="ion-padding-top">
           <ion-label>
-            Opacity <small>{this.opacity}%</small>
+            Непрозрачность <small>{this.opacity}%</small>
           </ion-label>
         </ion-item-divider>
         <ion-item class="item-range">

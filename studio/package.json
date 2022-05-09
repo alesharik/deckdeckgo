@@ -35,8 +35,9 @@
     "@deckdeckgo/markdown": "^2.1.1",
     "@deckdeckgo/math": "^2.1.0",
     "@deckdeckgo/monaco-editor": "^1.1.0",
-    "@deckdeckgo/offline": "^0.0.6",
-    "@deckdeckgo/remote": "^2.2.0",
+    "@deckdeckgo/offline": "file:../provider/offline",
+    "@deckdeckgo/remote": "file:../webcomponents/remote",
+    "deckdeckgo-remote": "file:../remote",
     "@deckdeckgo/slide-aspect-ratio": "^3.4.0",
     "@deckdeckgo/slide-author": "^2.4.0",
     "@deckdeckgo/slide-chart": "^2.5.0",
@@ -56,7 +57,9 @@
     "@deckdeckgo/utils": "^5.1.0",
     "@deckdeckgo/word-cloud": "^1.2.0",
     "@ionic/core": "^5.9.1",
+    "@stencil/react-output-target": "^0.3.1",
     "idb-keyval": "^6.0.3",
+    "react-scripts": "^5.0.1",
     "socket.io-client": "2.3.1",
     "uuid": "^8.3.2",
     "web-social-share": "^8.0.0"
@@ -75,7 +78,7 @@
     "autoprefixer": "^10.3.7",
     "prettier": "^2.4.1",
     "prettier-plugin-organize-imports": "^2.3.4",
-    "workbox-build": "5.1.4"
+    "workbox-build": "^4.3.1"
   },
   "repository": {
     "type": "git",
@@ -93,5 +96,6 @@
     "slides",
     "slideshow",
     "talk"
-  ]
+  ],
+  "types": "src/components.d.ts"
 }

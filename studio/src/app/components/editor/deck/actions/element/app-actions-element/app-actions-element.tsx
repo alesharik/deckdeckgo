@@ -256,22 +256,6 @@ export class AppActionsElement {
     this.resetted.emit();
   }
 
-  private async confirmDeleteElement($event: UIEvent) {
-    const popover: HTMLIonPopoverElement = await popoverController.create({
-      component: 'app-delete',
-      event: $event,
-      mode: 'ios'
-    });
-
-    popover.onDidDismiss().then(async ({data}: OverlayEventDetail) => {
-      if (data) {
-        await this.deleteElement();
-      }
-    });
-
-    await popover.present();
-  }
-
   private deleteElement(): Promise<void> {
     return new Promise<void>(async (resolve) => {
       if (!this.selectedTarget) {
@@ -937,7 +921,7 @@ export class AppActionsElement {
         } else if (detail.data.action === MoreAction.CLONE) {
           await this.clone();
         } else if (detail.data.action === MoreAction.DELETE) {
-          await this.confirmDeleteElement($event);
+          await this.deleteElement();
         } else if (detail.data.action === MoreAction.IMAGES) {
           await this.openShape('app-image-element');
         } else if (detail.data.action === MoreAction.TRANSFORM) {
@@ -969,7 +953,6 @@ export class AppActionsElement {
         </ion-buttons>
 
         <ion-buttons slot="end">
-          {this.renderNotes()}
           {this.renderClone()}
           {this.renderTransform()}
           {this.renderDelete()}
@@ -982,30 +965,13 @@ export class AppActionsElement {
   private renderDelete() {
     return (
       <button
-        onClick={($event: UIEvent) => this.confirmDeleteElement($event)}
+        onClick={() => this.deleteElement()}
         aria-label={i18n.state.editor.delete}
         disabled={busyStore.state.busy && this.selectedTarget?.type === 'slide'}
         class="wider-devices ion-activatable">
         <ion-ripple-effect></ion-ripple-effect>
         <AppIcon name="trash-bin" ariaLabel="" ariaHidden={true}></AppIcon>
         <ion-label aria-hidden="true">{i18n.state.editor.delete}</ion-label>
-      </button>
-    );
-  }
-
-  private renderNotes() {
-    const classElement: string | undefined = `wider-devices ion-activatable ${this.selectedTarget?.type === 'slide' ? '' : 'hidden'}`;
-
-    return (
-      <button
-        onClick={() => this.openNotes()}
-        aria-label={i18n.state.editor.notes}
-        disabled={busyStore.state.busy}
-        class={classElement}
-        tabindex={this.selectedTarget?.type === 'slide' ? 0 : -1}>
-        <ion-ripple-effect></ion-ripple-effect>
-        <AppIcon name="create" ariaLabel="" ariaHidden={true}></AppIcon>
-        <ion-label aria-hidden="true">{i18n.state.editor.notes}</ion-label>
       </button>
     );
   }

@@ -112,7 +112,4 @@ workbox.routing.registerRoute(
 );
 
 // the precache manifest will be injected into the following line
-self.workbox.precaching.precacheAndRoute(self.__WB_MANIFEST, {
-  // Ignore all URL parameters otherwise /editor/:id won't be cached and therefore not accessible directly offline
-  ignoreURLParametersMatching: [/.*/]
-});
+self.workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);

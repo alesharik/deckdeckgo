@@ -671,7 +671,7 @@ export class RemoteEvents {
       return;
     }
 
-    await deckgoRemoteElement.start(request.fromSocketId);
+    await deckgoRemoteElement.start();
   }
 
   private async emitRemoteSlideDidChange() {

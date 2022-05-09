@@ -3,20 +3,20 @@ deckgo-deck {
   h2,
   h3 {
     &:empty:not(:focus):after {
-      content: "Click to add title";
+      content: "Нажмите, чтобы добавить заголовок";
     }
   }
 
   section {
     &:empty:not(:focus):after {
-      content: "Click to add content";
+      content: "Нажмите, чтобы добавить содержимое";
     }
   }
 
   ol li,
   ul li {
     &:empty:not(:focus):after {
-      content: "Click to add content";
+      content: "Нажмите, чтобы добавить содержимое";
     }
   }
 
@@ -36,7 +36,7 @@ deckgo-deck {
       height: 100%;
 
       &::after {
-        content: "Click to add an image";
+        content: "Нажмите, чтобы добавить изображение";
         position: absolute;
         left: 50%;
         top: 50%;
@@ -52,7 +52,7 @@ deckgo-deck {
     h2,
     h3 {
       &:empty:not(:focus):after {
-        content: "Click to add content";
+        content: "Нажмите, чтобы добавить содержимое";
       }
     }
   }
@@ -60,7 +60,7 @@ deckgo-deck {
   deckgo-slide-aspect-ratio {
     section {
       &:empty:not(:focus):after {
-        content: "Double click to\A edit text";
+        content: "Дважды щелкните, чтобы\A отредактировать текст";
         white-space: pre;
       }
 
@@ -76,7 +76,7 @@ deckgo-deck {
     h3,
     section {
       &:empty:not(:focus):after {
-        content: "Click to add a caption";
+        content: "Нажмите, чтобы добавить заголовок";
       }
     }
   }
@@ -87,14 +87,14 @@ deckgo-deck {
     h3,
     section {
       &:empty:not(:focus):after {
-        content: "Click to tell something about yourself";
+        content: "Нажмите, чтобы рассказать что-нибудь о себе";
       }
     }
   }
 
   deckgo-slide-aspect-ratio {
     &:empty:not(:focus):after {
-      content: "Add text, shapes or images";
+      content: "Добавьте текст, фигуры или изображения";
       font-size: 2em;
       min-height: 1.7em;
       position: absolute;

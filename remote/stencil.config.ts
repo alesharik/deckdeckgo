@@ -5,6 +5,7 @@ import {postcss} from '@stencil/postcss';
 const autoprefixer = require('autoprefixer');
 
 import builtins from 'rollup-plugin-node-builtins';
+import { reactOutputTarget as react } from '@stencil/react-output-target';
 
 // https://stenciljs.com/docs/config
 
@@ -17,12 +18,25 @@ if (dev) {
 }
 
 export const config: Config = {
+  namespace: 'deckdeckgo-remote',
   outputTargets: [
     {
       type: 'www',
       baseUrl: 'https://deckdeckgo.app',
       copy: [{src: 'robots.txt'}]
-    }
+    },
+    react({
+      componentCorePackage: 'deckdeckgo-studio',
+      proxiesFile: 'test/index.ts',
+      includeDefineCustomElements: true,
+    }),
+    {
+      type: 'dist',
+      esmLoaderPath: '../loader',
+    },
+    {
+      type: 'dist-custom-elements-bundle',
+    },
   ],
   globalScript: globalScript,
   globalStyle: 'src/global/app.scss',

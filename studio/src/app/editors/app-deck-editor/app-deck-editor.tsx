@@ -1,13 +1,12 @@
 import {isSlide} from '@deckdeckgo/deck-utils';
 import {convertStyle, elementIndex, SlideTemplate, throwError} from '@deckdeckgo/editor';
 import {getEdit} from '@deckdeckgo/offline';
-import {SlotType} from '@deckdeckgo/studio';
 import {ChartEvents, ImageLoadEvents} from '@deckdeckgo/sync';
 import {debounce, isAndroidTablet, isFullscreen, isIOS, isIPad, isMobile} from '@deckdeckgo/utils';
 import type {ItemReorderEventDetail, OverlayEventDetail} from '@ionic/core';
 import {modalController, popoverController} from '@ionic/core';
 import {StyloConfigToolbar, StyloPaletteColor} from '@papyrs/stylo';
-import {Component, ComponentInterface, Element, h, JSX, Listen, Method, State} from '@stencil/core';
+import {Component, ComponentInterface, Element, h, JSX, Listen, Method, Prop, State} from '@stencil/core';
 import {get, set} from 'idb-keyval';
 import {EnvironmentGoogleConfig} from '../../config/environment-config';
 import {CodeEvents} from '../../events/editor/code/code.events';
@@ -30,6 +29,7 @@ import {signIn as navigateSignIn} from '../../utils/core/signin.utils';
 import {ColorUtils} from '../../utils/editor/color.utils';
 import {CreateSlidesUtils} from '../../utils/editor/create-slides.utils';
 import {ParseDeckSlotsUtils} from '../../utils/editor/parse-deck-slots.utils';
+import {v4 as uuid} from "uuid";
 
 @Component({
   tag: 'app-deck-editor',
@@ -68,6 +68,8 @@ export class AppDeckEditor implements ComponentInterface {
   @State()
   private activeIndex: number = 0;
 
+  @Prop() autoConnect: boolean = true;
+
   private readonly deckDataEvents: DeckDataEvents = new DeckDataEvents();
   private readonly deckEditorEvents: DeckEditorEvents = new DeckEditorEvents();
   private readonly remoteEvents: RemoteEvents = new RemoteEvents();
@@ -101,7 +103,6 @@ export class AppDeckEditor implements ComponentInterface {
   private actionsEditorRef!: HTMLAppActionsDeckEditorElement;
   private contentRef!: HTMLElement;
   private mainRef!: HTMLElement;
-  private breadCrumbsRef!: HTMLAppBreadcrumbsElement;
 
   private mainResizeObserver: ResizeObserver;
   private slideResizeObserver: ResizeObserver;
@@ -160,6 +161,20 @@ export class AppDeckEditor implements ComponentInterface {
     ColorUtils.updateColor(detail);
 
     this.updateEditorToolbarConfig();
+  }
+
+  @Listen('slideDeckChange', {target: 'document', passive: true})
+  onSlideDeckChange({detail}: CustomEvent<{deckId: string}>) {
+    void (async () => {
+      this.slidesFetched = false;
+
+      await this.reset();
+      await this.fetchSlides(detail.deckId);
+      this.slidesFetched = true;
+      await this.deckRef.slideTo(0);
+      // Select deck
+      this.actionsEditorRef?.selectStep(undefined);
+    })()
   }
 
   private updateEditorToolbarConfig() {
@@ -269,7 +284,7 @@ export class AppDeckEditor implements ComponentInterface {
       this.mainResizeObserver.unobserve(this.actionsEditorRef);
       this.mainResizeObserver.disconnect();
     }
-  }
+  }f
 
   private async updateInlineEditorListener(): Promise<void> {
     if (!this.deckRef) {
@@ -287,8 +302,7 @@ export class AppDeckEditor implements ComponentInterface {
 
   private async initSlide() {
     const slide: JSX.IntrinsicElements = await CreateSlidesUtils.createSlide({
-      template: SlideTemplate.TITLE,
-      elements: [SlotType.H1, SlotType.SECTION]
+      template: SlideTemplate["ASPECT-RATIO"]
     });
 
     await this.concatSlide(slide);
@@ -323,9 +337,9 @@ export class AppDeckEditor implements ComponentInterface {
       this.directionMobile = editorStore.state.deck.data.attributes.directionMobile;
     }
 
-    this.background = await ParseDeckSlotsUtils.convert(editorStore.state.deck.data.background, 'background');
-    this.header = await ParseDeckSlotsUtils.convert(editorStore.state.deck.data.header, 'header');
-    this.footer = await ParseDeckSlotsUtils.convert(editorStore.state.deck.data.footer, 'footer');
+    this.background = await ParseDeckSlotsUtils.convert(editorStore.state.deck?.data?.background, 'background');
+    this.header = await ParseDeckSlotsUtils.convert(editorStore.state.deck?.data?.header, 'header');
+    this.footer = await ParseDeckSlotsUtils.convert(editorStore.state.deck?.data?.footer, 'footer');
 
     const google: EnvironmentGoogleConfig = EnvironmentConfigService.getInstance().get('google');
     await this.fontsService.loadGoogleFont(google.fontsUrl, this.style);
@@ -396,7 +410,7 @@ export class AppDeckEditor implements ComponentInterface {
       return;
     }
 
-    await this.concatSlide($event.detail);
+    await this.concatSlide(<deckgo-slide-aspect-ratio key={uuid()} grid={true} editable={true} />);
   }
 
   @Listen('openEmbed', {target: 'document'})
@@ -537,7 +551,7 @@ export class AppDeckEditor implements ComponentInterface {
   private async selectDeck($event: MouseEvent | TouchEvent) {
     const src: HTMLElement = $event.composedPath()[0] as HTMLElement;
 
-    if (!this.contentRef.isEqualNode(src) && !this.breadCrumbsRef.isEqualNode(src)) {
+    if (!this.contentRef.isEqualNode(src)) {
       return;
     }
 
@@ -751,6 +765,15 @@ export class AppDeckEditor implements ComponentInterface {
     if (index < 0 || this.activeIndex === index) {
       return;
     }
+    console.log('Slide index ' + index);
+    // @ts-ignore
+    if (window.slideProxy) {
+      const deck = editorStore.state.deck;
+      if (deck && deck.data.slides) {
+        // @ts-ignore
+        window.slideProxy.onPageChange(deck.data.slides[index]);
+      }
+    }
 
     this.activeIndex = index;
   }
@@ -762,6 +785,12 @@ export class AppDeckEditor implements ComponentInterface {
   @Listen('deckDidLoad', {target: 'document'})
   onDeckDidLoad() {
     busyStore.state.deckReady = true;
+    const deck = editorStore.state.deck;
+    console.log('Deck loaded');
+    if (deck && deck.data.slides) {
+      // @ts-ignore
+      window.slideProxy.onPageChange(deck.data.slides[0]);
+    }
   }
 
   render() {
@@ -801,16 +830,16 @@ export class AppDeckEditor implements ComponentInterface {
                   {this.header}
                   {this.footer}
                 </deckgo-deck>
-                <deckgo-remote autoConnect={false}></deckgo-remote>
-                <app-slide-warning></app-slide-warning>
+                <deckgo-remote autoConnect={this.autoConnect}></deckgo-remote>
+                {/*<app-slide-warning></app-slide-warning>*/}
                 {this.renderInlineEditor()}
               </main>
             </div>
 
-            <app-breadcrumbs
-              ref={(el) => (this.breadCrumbsRef = el as HTMLAppBreadcrumbsElement)}
-              slideNumber={this.activeIndex}
-              onStepTo={($event: CustomEvent<HTMLElement>) => this.selectStep($event)}></app-breadcrumbs>
+            {/*<app-breadcrumbs*/}
+            {/*  ref={(el) => (this.breadCrumbsRef = el as HTMLAppBreadcrumbsElement)}*/}
+            {/*  slideNumber={this.activeIndex}*/}
+            {/*  onStepTo={($event: CustomEvent<HTMLElement>) => this.selectStep($event)}></app-breadcrumbs>*/}
 
             <app-actions-deck-editor
               ref={(el) => (this.actionsEditorRef = el as HTMLAppActionsDeckEditorElement)}

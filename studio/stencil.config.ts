@@ -2,6 +2,7 @@ import replace from '@rollup/plugin-replace';
 import {Config} from '@stencil/core';
 import {postcss} from '@stencil/postcss';
 import {sass} from '@stencil/sass';
+import { reactOutputTarget as react } from '@stencil/react-output-target';
 
 const autoprefixer = require('autoprefixer');
 
@@ -26,9 +27,8 @@ const globalScript: string =
 const configDataFile = dev && !staging ? './config.dev.json' : staging || internetComputer ? './config.staging.json' : './config.prod.json';
 const configValues = require(configDataFile);
 
-const assetLinks = !prod ? 'assetlinks.dev.json' : 'assetlinks.prod.json';
-
 export const config: Config = {
+  namespace: 'deckdeckgo-studio',
   outputTargets: [
     {
       type: 'www',
@@ -37,10 +37,21 @@ export const config: Config = {
       },
       copy: [
         {src: 'robots.txt'},
-        {src: `${assetLinks}`, dest: `.well-known/assetlinks.json`},
         {src: `${__dirname}/node_modules/@deckdeckgo/monaco-editor/workers/`, dest: `${__dirname}/www/build`}
       ]
-    }
+    },
+    react({
+      componentCorePackage: 'deckdeckgo-studio',
+      proxiesFile: 'test/index.ts',
+      includeDefineCustomElements: true,
+    }),
+    {
+      type: 'dist',
+      esmLoaderPath: '../loader',
+    },
+    {
+      type: 'dist-custom-elements-bundle',
+    },
   ],
   globalScript: globalScript,
   globalStyle: 'src/global/app.scss',

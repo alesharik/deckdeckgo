@@ -33,9 +33,11 @@ export class ThemeService {
       if (savedDarkModePreference !== undefined) {
         await this.switch(savedDarkModePreference);
         return;
+      } else {
+        await this.switch(true);
       }
     } catch (err) {
-      await this.switch(false);
+      await this.switch(true);
       return;
     }
 

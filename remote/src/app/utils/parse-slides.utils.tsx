@@ -68,6 +68,7 @@ export class ParseSlidesUtils {
 
       const div: HTMLDivElement = document.createElement('div');
       div.innerHTML = slide.content;
+      div.querySelectorAll("deckgo-lazy-img").forEach(value => value.removeAttribute('custom-loader'));
 
       const cleanDiv: HTMLDivElement = document.createElement('div');
 

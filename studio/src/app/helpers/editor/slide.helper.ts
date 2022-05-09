@@ -2,7 +2,6 @@ import {Deck, Slide, throwError} from '@deckdeckgo/editor';
 import {getOfflineSlide} from '@deckdeckgo/offline';
 import {loadDeck} from '@deckdeckgo/sync';
 import {JSX} from '@stencil/core';
-import {initTemplates} from '../../providers/data/template/template.provider';
 import busyStore from '../../stores/busy.store';
 import editorStore from '../../stores/editor.store';
 import {ParseSlidesUtils} from '../../utils/editor/parse-slides.utils';
@@ -20,8 +19,6 @@ export class SlideHelper {
           resolve([]);
           return;
         }
-
-        await initTemplates();
 
         const promises: Promise<JSX.IntrinsicElements>[] = [];
         deck.data.slides.forEach((slideId: string) => {

@@ -28,6 +28,13 @@ const nlI18n = async (): Promise<I18n> => {
   };
 };
 
+const ruI18n = async (): Promise<I18n> => {
+  return {
+    lang: 'ru',
+    ...(await import(`../../assets/i18n/ru.json`))
+  };
+};
+
 const enI18n = (): I18n => {
   return {
     lang: 'en',
@@ -47,6 +54,9 @@ onChange('lang', async (lang: Languages) => {
       break;
     case 'nl':
       bundle = await nlI18n();
+      break;
+    case 'ru':
+      bundle = await ruI18n();
       break;
     default:
       bundle = enI18n();

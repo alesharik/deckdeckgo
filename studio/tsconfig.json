@@ -13,7 +13,8 @@
     "jsx": "react",
     "jsxFactory": "h",
     "resolveJsonModule": true,
-    "typeRoots": ["node_modules/@types", "node_modules/@deckdeckgo"]
+    "typeRoots": ["node_modules/@types", "node_modules/@deckdeckgo"],
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]

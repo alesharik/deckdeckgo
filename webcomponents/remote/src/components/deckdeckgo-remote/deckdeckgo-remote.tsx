@@ -69,22 +69,20 @@ export class DeckdeckgoRemote {
     });
 
     this.destroyEventListener = store.onChange('$event', async ($event: DeckdeckgoEvent) => {
-      if ($event.emitter === DeckdeckgoEventEmitter.APP) {
-        if ($event.type === DeckdeckgoEventType.SLIDES_REQUEST) {
-          // If app is asking for the deck length, how many slides, we answer directly
-          await this.sendSlidesToApp(DeckdeckgoEventType.SLIDES_ANSWER);
-        } else if ($event.type === DeckdeckgoEventType.CLEAR_SLIDE) {
-          await this.clear();
-        } else if ($event.type === DeckdeckgoEventType.START_DRAWING) {
-          await this.startDrawing($event as DeckdeckgoEventDraw);
-        } else if ($event.type === DeckdeckgoEventType.END_DRAWING) {
-          await this.endDrawing($event as DeckdeckgoEventDraw);
-        } else if ($event.type === DeckdeckgoEventType.DRAW) {
-          await this.draw($event as DeckdeckgoEventDraw);
-        } else {
-          // Else it's a command to apply on the deck, we propagate
-          this.event.emit($event);
-        }
+      if ($event.type === DeckdeckgoEventType.SLIDES_REQUEST) {
+        // If app is asking for the deck length, how many slides, we answer directly
+        await this.sendSlidesToApp(DeckdeckgoEventType.SLIDES_ANSWER);
+      } else if ($event.type === DeckdeckgoEventType.CLEAR_SLIDE) {
+        await this.clear();
+      } else if ($event.type === DeckdeckgoEventType.START_DRAWING) {
+        await this.startDrawing($event as DeckdeckgoEventDraw);
+      } else if ($event.type === DeckdeckgoEventType.END_DRAWING) {
+        await this.endDrawing($event as DeckdeckgoEventDraw);
+      } else if ($event.type === DeckdeckgoEventType.DRAW) {
+        await this.draw($event as DeckdeckgoEventDraw);
+      } else {
+        // Else it's a command to apply on the deck, we propagate
+        this.event.emit($event);
       }
     });
 
@@ -104,7 +102,7 @@ export class DeckdeckgoRemote {
   }
 
   async disconnectedCallback() {
-    await this.communicationService.disconnect();
+    this.communicationService.disconnect();
 
     if (this.destroyStateListener) {
       this.destroyStateListener();
@@ -136,15 +134,7 @@ export class DeckdeckgoRemote {
   @Method()
   connect(): Promise<void> {
     return new Promise<void>(async (resolve) => {
-      if (!this.room) {
-        resolve();
-        return;
-      }
-
-      this.communicationService.room = this.room;
-      this.communicationService.socketUrl = this.socketUrl;
-
-      await this.communicationService.disconnect();
+      this.communicationService.disconnect();
       await this.communicationService.connect();
 
       resolve();
@@ -154,15 +144,15 @@ export class DeckdeckgoRemote {
   @Method()
   disconnect(): Promise<void> {
     return new Promise<void>(async (resolve) => {
-      await this.communicationService.disconnect();
+      this.communicationService.disconnect();
 
       resolve();
     });
   }
 
   @Method()
-  async start(appSocketId: string) {
-    await this.communicationService.start(appSocketId);
+  async start() {
+    // await this.communicationService.start(appSocketId);
   }
 
   private initContext(): Promise<void> {

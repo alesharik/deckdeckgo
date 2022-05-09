@@ -1,4 +1,4 @@
-app-remote {
+app-remote-viewer {
   @import "../../../global/theme/button";
 
   main.connected {
@@ -22,13 +22,7 @@ app-remote {
     .deck-container {
       .deck {
         aspect-ratio: 16 / 9;
-        width: 60vw;
-      }
-      .deck-navigation-button-prev {
-        grid-area: prev;
-      }
-      .deck-navigation-button-next {
-        grid-area: next;
+        width: calc(100% - 32px);
       }
     }
 
@@ -70,38 +64,6 @@ app-remote {
       .deck-container {
         grid-area: deck;
         height: 100%;
-        width: 60vw;
-      }
-      .deck-navigation-container {
-        width: 60vw;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        margin-top: 16px;
-      }
-      .deck-navigation-button {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: black;
-        font-size: 36px;
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-        background-color: #5ED1BA;
-        cursor: pointer;
-        user-select: none;
-        margin-right: 24px;
-        margin-left: 24px;
-
-        &:hover {
-          background-color: #49b8b8;
-        }
-
-        &:active {
-          background-color: #3f9e9e;
-        }
       }
     }
   }

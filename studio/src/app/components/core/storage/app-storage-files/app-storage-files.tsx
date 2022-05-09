@@ -1,9 +1,9 @@
 import {AuthUser, StorageFile, StorageFilesList, throwError} from '@deckdeckgo/editor';
-import {getFiles} from '@deckdeckgo/sync';
 import {Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Prop, State, Watch} from '@stencil/core';
 import {Constants} from '../../../../config/constants';
 import authStore from '../../../../stores/auth.store';
 import i18n from '../../../../stores/i18n.store';
+import {getOfflineFiles} from "@deckdeckgo/offline";
 
 @Component({
   tag: 'app-storage-files',
@@ -59,10 +59,6 @@ export class AppStorageFiles implements ComponentInterface {
   }
 
   private async search() {
-    if (!authStore.state.loggedIn) {
-      return;
-    }
-
     const {items, nextPageToken}: StorageFilesList = await this.loadFiles();
 
     this.files = [...this.files, ...items];
@@ -75,7 +71,7 @@ export class AppStorageFiles implements ComponentInterface {
 
   private async loadFiles(): Promise<StorageFilesList> {
     try {
-      const list: StorageFilesList = await getFiles({next: this.paginationNext, folder: this.folder});
+      const list: StorageFilesList = await getOfflineFiles(this.folder);
 
       if (!list || !list.items || list.items.length <= 0) {
         return {

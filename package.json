@@ -44,6 +44,7 @@
     }
   },
   "dependencies": {
-    "@deckdeckgo/utils": "file:utils/utils"
+    "@deckdeckgo/utils": "file:utils/utils",
+    "ws": "^8.6.0"
   }
 }

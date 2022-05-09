@@ -12,7 +12,8 @@ import navStore, {NavDirection, NavParams} from './stores/nav.store';
 import {authConfig} from './utils/core/auth.utils';
 
 @Component({
-  tag: 'app-root'
+  tag: 'app-root-control',
+  styleUrl: 'app-root.scss'
 })
 export class AppRoot {
   @Element() el: HTMLElement;
@@ -133,7 +134,7 @@ export class AppRoot {
     return [
       <ion-app>
         <ion-router useHash={false}>
-          <ion-route url=":any" component="app-editor" />
+          <ion-route url=":any" component="app-control" />
         </ion-router>
         <ion-nav id="menu-content" />
       </ion-app>

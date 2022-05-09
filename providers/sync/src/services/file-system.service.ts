@@ -78,6 +78,34 @@ export const exportData = async ({types}: {types: FilePickerAcceptType[]}) => {
   });
 };
 
+export function exportSlides(): Promise<string> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!isDeckEdited() && !isDocEdited()) {
+        throw new Error('No deck or doc found');
+      }
+
+      const deck: Deck | undefined = await getDeck();
+      const slides: Slide[] | undefined = await getSlides();
+
+      const doc: Doc | undefined = await getDoc();
+      const paragraphs: Paragraph[] | undefined = await getParagraphs();
+
+      resolve(JSON.stringify({
+        data: {
+          id: deck?.id || doc?.id,
+          ...(deck && {deck}),
+          ...(slides && {slides}),
+          ...(doc && {doc}),
+          ...(paragraphs && {paragraphs})
+        }
+      }));
+    } catch (e: unknown) {
+      reject(e)
+    }
+  })
+}
+
 const isDeckEdited = (): boolean => {
   return !DeckStore.getInstance().get() || !DeckStore.getInstance().get().id || !DeckStore.getInstance().get().data;
 };
